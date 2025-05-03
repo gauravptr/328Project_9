@@ -88,6 +88,33 @@ st.write("### 🗺️ Inspection Locations Map")
 df_map = df.dropna(subset=['Latitude', 'Longitude'])
 st.map(df_map[['Latitude', 'Longitude']])
 
+
+# --- Inspections Over Time ---
+
+def get_time_series(df):
+    df = df.copy()
+    df['Inspection Date'] = pd.to_datetime(df['Inspection Date'])
+    ts = (
+       df.groupby(df['Inspection Date'].dt.to_period('M'))
+         .size()
+         .reset_index(name='Count')
+    )
+    ts['Inspection Date'] = ts['Inspection Date'].dt.to_timestamp()
+    return ts
+
+with st.expander("📅 View Inspections Over Time", expanded=True):
+    st.write("### 📈 Inspections Over Time")
+    df['Inspection Date'] = pd.to_datetime(df['Inspection Date'])
+    time_df = get_time_series(df)
+    time_df['Inspection Date'] = time_df['Inspection Date'].dt.to_timestamp()
+
+    fig_time = px.line(time_df, x='Inspection Date', y='Count',
+        title="Number of Inspections Over Time",
+        markers=True
+    )
+
+    st.plotly_chart(fig_time, use_container_width=True)
+
 # --- Filter by City ---
 st.write("### 🏙️ Filter by City")
 if df['City'].notna().sum() > 0:
