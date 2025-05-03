@@ -90,7 +90,6 @@ st.map(df_map[['Latitude', 'Longitude']])
 
 
 # --- Inspections Over Time ---
-
 def get_time_series(df):
     df = df.copy()
     df['Inspection Date'] = pd.to_datetime(df['Inspection Date'])
